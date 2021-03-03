@@ -2,6 +2,49 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+imgPath = input('Enter the imagem path: ')
+
+rgbImg = cv2.imread(imgPath)
+
+hslImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2HLS)
+hsvImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2HSV)
+grayImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2GRAY)
+
+Menu()
+option = int(input('Choose a option: '))
+
+while option != 0:
+
+    if option == 1:
+        ShowImg(rgbImg)
+        CloseAllWindows()
+        print()
+
+    elif option == 2:
+        MenuHSL()
+
+    elif option == 3:
+        # hsv menu
+
+        ShowImg(hsvImg)
+        CloseAllWindows()
+
+    elif option == 4:
+        # gray menu
+
+        ShowImg(grayImg)
+        CloseAllWindows()
+
+    else:
+        print('Invalid option')
+
+    print()
+    Menu()
+    print()
+    option = int(input('Choose a option: '))
+
+cv2.destroyAllWindows()
+
 
 def Menu():
     print('Press [1] To Show The Selected Image')
@@ -34,7 +77,8 @@ def MenuHSVInfo():
 
 def MenuGRAYInfo():
     print('Press [1] To Show The GRAY Image and Save')
-    print('Press [2] To Show The Histogram and Save')
+    print('Press [2] To Show The Channel and Save')
+    print('Press [3] To Show The Histograms of Each Channel and Save')
     print('Press [4] To Back')
     print()
     print('Press Esc To Close The Images')
@@ -59,6 +103,7 @@ def MenuHSL():
         elif option == 3:
             print()
             #ShowHistrograms()
+            
 
         else:
             print('Invalid option')
@@ -102,32 +147,6 @@ def MenuHSV():
         cv2.destroyAllWindows()
 
 
-def MenuGray():
-    MenuGRAYInfo()
-    option = int(input('Choose a option: '))
-
-    while option != 4:
-
-        if option == 1:
-            ShowImg(grayImg)
-            CloseAllWindows()
-            print()
-
-        elif option == 2:
-            print()
-            #ShowHistrograms()
-
-        else:
-            print('Invalid option')
-
-        print()
-        MenuGRAYInfo()
-        print()
-        option = int(input('Choose a option: '))
-
-        cv2.destroyAllWindows()
-
-
 def ShowImg(img):
     while True:
         cv2.imshow('Geovaninha', img)
@@ -153,43 +172,3 @@ def ShowChannels(channelOne, channelTwo, channelThree):
 
 def CloseAllWindows():
     cv2.destroyAllWindows()
-
-########################### Start ###########################
-
-
-imgPath = input('Enter the imagem path: ')
-
-rgbImg = cv2.imread(imgPath)
-
-hslImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2HLS)
-hsvImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2HSV)
-grayImg = cv2.cvtColor(rgbImg, cv2.COLOR_RGB2GRAY)
-
-Menu()
-option = int(input('Choose a option: '))
-
-while option != 0:
-
-    if option == 1:
-        ShowImg(rgbImg)
-        CloseAllWindows()
-        print()
-
-    elif option == 2:
-        MenuHSL()
-
-    elif option == 3:
-        MenuHSV()
-
-    elif option == 4:
-        MenuGray()
-
-    else:
-        print('Invalid option')
-
-    print()
-    Menu()
-    print()
-    option = int(input('Choose a option: '))
-
-cv2.destroyAllWindows()

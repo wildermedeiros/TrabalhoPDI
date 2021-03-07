@@ -4,12 +4,13 @@ import matplotlib.pyplot as plt
 #%matplotlib inline
 
 # DONE Verificar o savefile 
-# TODO Verificar o savefile nos channels
-# TODO Update menus infos about histograms
+# DONE Verificar o savefile nos channels
+# DONE Update menus infos about histograms
 # DONE Verificar o savefile nos histogramas 
+# MAYBE Verificar a ordem do split ?
 
 def Menu():
-    print('Press [1] To Show The Selected Image')
+    print('Press [1] To Show The Selected Image Menu Options')
     print('Press [2] To Go To HSL Menu Options')
     print('Press [3] To Go to HSV Menu Options')
     print('Press [4] To Go To Gray Menu Options')
@@ -17,6 +18,17 @@ def Menu():
     print('Press [0] To Close')
     print()
     print('Press Esc To Close The Images')
+
+
+def MenuRGBInfo():
+    print('Press [1] To Show The Selected Image and Save')
+    print('Press [2] To Show The Channels and Save')
+    print('Press [3] To Show The Histograms')
+    print('Press [4] To Back')
+    print()
+    print('INFO: Press Esc To Close The Images')
+    print('INFO: You Can Save and Manipulate The Histograms Direct From The Histogram Panel')
+    print()
 
 
 def MenuHSLInfo():
@@ -30,22 +42,56 @@ def MenuHSLInfo():
     print()
 
 
-
 def MenuHSVInfo():
     print('Press [1] To Show The HSV Image and Save')
     print('Press [2] To Show The Channels and Save')
-    print('Press [3] To Show The Histograms of Each Channel and Save')
+    print('Press [3] To Show The Histograms')
     print('Press [4] To Back')
     print()
-    print('Press Esc To Close The Images')
+    print('INFO: Press Esc To Close The Images')
+    print('INFO: You Can Save and Manipulate The Histograms Direct From The Histogram Panel')
+    print()
 
 
 def MenuGRAYInfo():
     print('Press [1] To Show The GRAY Image and Save')
-    print('Press [2] To Show The Histogram and Save')
+    print('Press [2] To Show The Histograms')
     print('Press [4] To Back')
     print()
-    print('Press Esc To Close The Images')
+    print('INFO: Press Esc To Close The Image')
+    print('INFO: You Can Save and Manipulate The Histograms Direct From The Histogram Panel')
+    print()
+
+
+def MenuRGB():
+    MenuRGBInfo()
+    option = int(input('Choose a option: '))
+
+    while option != 4:
+
+        if option == 1:
+            ShowImg(rgbImg)
+            SaveImage('rgbImg.jpg', rgbImg)
+            CloseAllWindows()
+            print()
+
+        elif option == 2:
+            ChannelHandler(rgbImg, 'RGB-IMAGE')
+            CloseAllWindows()
+            print()
+
+        elif option == 3:
+            ShowHistrograms(rgbImg)
+
+        else:
+            print('Invalid option')
+
+        print()
+        MenuRGBInfo()
+        print()
+        option = int(input('Choose a option: '))
+
+        cv2.destroyAllWindows()
 
 
 def MenuHSL():
@@ -87,6 +133,7 @@ def MenuHSV():
 
         if option == 1:
             ShowImg(hsvImg)
+            SaveImage('hsvImg.jpg', hsvImg)
             CloseAllWindows()
             print()
 
@@ -122,7 +169,7 @@ def MenuGray():
             print()
 
         elif option == 2:
-            ShowHistrograms(grayImg)
+            ShowHistogram(grayImg)
 
         else:
             print('Invalid option')
@@ -184,6 +231,16 @@ def ShowHistrograms(img):
 
     plt.show()
 
+def ShowHistogram(img):
+    plt.xlim([0, 256])
+    histogram, bin_edges = np.histogram(img, bins=256, range=(0, 256))
+    plt.plot(bin_edges[0:-1], histogram)
+
+    plt.xlabel("Color value")
+    plt.ylabel("Pixels")
+
+    plt.show()
+
 def CloseAllWindows():
     cv2.destroyAllWindows()
 
@@ -208,9 +265,7 @@ print()
 while option != 0:
 
     if option == 1:
-        ShowImg(rgbImg)
-        CloseAllWindows()
-        print()
+        MenuRGB()
 
     elif option == 2:
         MenuHSL()

@@ -2,9 +2,33 @@ import cv2
 import numpy as np
 import time
 
-
 def nothing(x):
     pass
+
+def MedianBlur(frame):
+    global dest 
+
+    medianBlurKernel = cv2.getTrackbarPos('Median Blur', 'Aula2')
+
+    dest = frame.copy()
+
+    cv2.medianBlur(frame, medianBlurKernel, dest)
+
+    time.sleep(1/180)
+    cv2.imshow('Aula2', dest)
+
+
+def GaussianBlur(frame):
+    global dest
+
+    gaussianBlurKernel = cv2.getTrackbarPos('Gaussian Blur', 'Aula2')
+
+    dest = frame.copy()
+
+    cv2.GaussianBlur(frame, (gaussianBlurKernel, gaussianBlurKernel), 10, dest)
+
+    time.sleep(1/180)
+    cv2.imshow('Aula2', dest)
 
 def GetRBGFromInput(event, x, y, flags, param):
     
@@ -26,8 +50,10 @@ def clamp(value, smallest, largest):
 cv2.namedWindow('Aula2')
 cv2.setMouseCallback('Aula2', GetRBGFromInput)
 
-cv2.createTrackbar('Median Blur', 'Aula2', 3, 11, nothing)
-cv2.createTrackbar('Gaussian Blur', 'Aula2', 1, 20, nothing)
+cv2.createTrackbar("Median Blur", 'Aula2', 1, 11, nothing)
+cv2.createTrackbar("Gaussian Blur", 'Aula2', 1, 11, nothing)
+switch = "0 : Median Blur \n1 : Gaussian Blur"
+cv2.createTrackbar(switch, 'Aula2', 0, 1, nothing)
 
 cap = cv2.VideoCapture('c:/video.mp4')
 
@@ -35,30 +61,30 @@ if cap.isOpened() == False:
     print("ERROR: FILE NOT FOUND OR WRONG CODEC USED")
 
 
-
-
 while cap.isOpened:
     ret, frame = cap.read()
+    dest = np.copy(frame)
 
     if ret:
 
-        medianBlurKernel = cv2.getTrackbarPos('Median Blur', 'Aula2')
-        gaussianBlur = cv2.getTrackbarPos('Gaussian Blur', 'Aula2')
+        medianBlurKernel = cv2.getTrackbarPos("Median Blur", 'Aula2')
+        gaussianBlurKernel = cv2.getTrackbarPos("Gaussian Blur", 'Aula2')
+        switchTrackBar = cv2.getTrackbarPos(switch, 'Aula2')
 
-        bluredFrame = cv2.medianBlur(frame, medianBlurKernel)
-
-        # efeito é o kernel que será aplicado no blur e outros efeitos  
-
-        grayFrame = cv2.cvtColor(bluredFrame, cv2.COLOR_RGB2GRAY)
-
-        thresholdValue, frameThresholded = cv2.threshold(
-            grayFrame, 70, 255, cv2.THRESH_BINARY)
-
+        if switchTrackBar == 0:
+            blurredFrame = cv2.medianBlur(frame, medianBlurKernel)
+        else:
+            blurredFrame = cv2.GaussianBlur(
+                frame, (gaussianBlurKernel, gaussianBlurKernel), 10)
         
+        grayFrame = cv2.cvtColor(blurredFrame, cv2.COLOR_RGB2GRAY)
+
+        thresholdValue, frameThresholded = cv2.threshold(grayFrame, 70, 255, cv2.THRESH_BINARY)
 
         time.sleep(1/180)
         cv2.imshow('Aula2', frameThresholded)
 
+        
         if cv2.waitKey(1) & 0xFF == 27:
            break
 

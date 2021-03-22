@@ -20,11 +20,14 @@ def GetRBGFromInput(event, x, y, flags, param):
         print("Coordinates of pixel: X: ", x, "Y: ", y)
 
 
+def clamp(value, smallest, largest): 
+    return max(smallest, min(value, largest))
+
 cv2.namedWindow('Aula2')
 cv2.setMouseCallback('Aula2', GetRBGFromInput)
 
-cv2.createTrackbar('Efeito 1', 'Aula2', 0, 256, nothing)
-cv2.createTrackbar('Efeito 2', 'Aula2', 0, 256, nothing)
+cv2.createTrackbar('Median Blur', 'Aula2', 3, 11, nothing)
+cv2.createTrackbar('Gaussian Blur', 'Aula2', 1, 20, nothing)
 
 cap = cv2.VideoCapture('c:/video.mp4')
 
@@ -39,13 +42,22 @@ while cap.isOpened:
 
     if ret:
 
-        efeito1 = cv2.getTrackbarPos('Blue', 'Aula2')
-        efeito2 = cv2.getTrackbarPos('Green', 'Aula2')
+        medianBlurKernel = cv2.getTrackbarPos('Median Blur', 'Aula2')
+        gaussianBlur = cv2.getTrackbarPos('Gaussian Blur', 'Aula2')
 
-        #aplica o efeito aqui ? 
+        bluredFrame = cv2.medianBlur(frame, medianBlurKernel)
+
+        # efeito é o kernel que será aplicado no blur e outros efeitos  
+
+        grayFrame = cv2.cvtColor(bluredFrame, cv2.COLOR_RGB2GRAY)
+
+        thresholdValue, frameThresholded = cv2.threshold(
+            grayFrame, 70, 255, cv2.THRESH_BINARY)
+
+        
 
         time.sleep(1/180)
-        cv2.imshow('Aula2', frame)
+        cv2.imshow('Aula2', frameThresholded)
 
         if cv2.waitKey(1) & 0xFF == 27:
            break

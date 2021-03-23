@@ -76,10 +76,15 @@ while cap.isOpened:
         else:
             blurredFrame = cv2.GaussianBlur(
                 frame, (gaussianBlurKernel, gaussianBlurKernel), 10)
-        
+
         grayFrame = cv2.cvtColor(blurredFrame, cv2.COLOR_RGB2GRAY)
 
-        thresholdValue, frameThresholded = cv2.threshold(grayFrame, 70, 255, cv2.THRESH_BINARY)
+        sobelx = cv2.Sobel(grayFrame, cv2.CV_64F, 1, 0, ksize=5)
+        sobely = cv2.Sobel(grayFrame, cv2.CV_64F, 0, 1, ksize=5)
+        blended = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
+
+        thresholdValue, frameThresholded = cv2.threshold(
+            blended, 70, 255, cv2.THRESH_BINARY)
 
         time.sleep(1/180)
         cv2.imshow('Aula2', frameThresholded)

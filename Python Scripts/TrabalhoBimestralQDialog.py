@@ -121,7 +121,10 @@ class Ui_Dialog(QDialog):
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
         self.browseFileButton.clicked.connect(self.BrowseFile)
-        self.convertRGB2HSLButton.clicked.connect(self.ConvertRGB2HSL)
+        self.convertRGB2HSLButton.clicked.connect(self.ConvertBGR2HSL)
+        self.applyThresholdButton.clicked.connect(self.ApplyBinaryThreshold)
+        self.applyGaussianButton.clicked.connect(self.ApplyGaussianBlur)
+        self.applyMorphGradButton.clicked.connect(self.ApplyGradientMorph)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -155,22 +158,70 @@ class Ui_Dialog(QDialog):
         self.listWidget.addItem(filePath[0])
 
 
-
-    def ConvertRGB2HSL(self):
+    def ConvertBGR2HSL(self):
         global img
+
+        if (len(img.shape) == 2):
+            img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
+
+        cv2.imshow("HSL Conversion", img)
         
-        hslImg = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
 
-        height, width, channel = hslImg.shape
-        bytesPerLine = 3 * width
-        qImg = QtGui.QImage(hslImg.data, width, height,
-                            bytesPerLine, QtGui.QImage.Format_RGB888)
+    def ApplyBinaryThreshold(self):
+        global img
 
-        self.label.setPixmap(QtGui.QPixmap.fromImage(qImg))
-        self.listWidget.addItem()
+        if (len(img.shape) == 3):
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
 
-        #cv2.imshow('Aula2', dest)
+        thresholdValue, img = cv2.threshold(
+            img, 127, 255, cv2.THRESH_BINARY)
 
+        cv2.imshow("Threshold Binary Applied", img)
+
+
+    def ApplyGaussianBlur(self):
+        global img
+
+        img = cv2.GaussianBlur(img, (5, 5), 10)
+
+        cv2.imshow("Gaussian Blur Applied", img)
+        
+
+
+    def ApplyGradientMorph(self):
+        global img
+
+        if (len(img.shape) == 3):
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
+
+        sobelx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=5)
+        sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=5)
+        img = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
+
+        cv2.imshow("Aula2", img)
+
+
+# def ConvertOpenCvImageToQImage(img, self):
+#     height, width, channel = img.shape
+#     bytesPerLine = 3 * width
+#     qImg = QtGui.QImage(img.data, width, height,
+#                         bytesPerLine, QtGui.QImage.Format_RGB888)
+
+#     self.label.setPixmap(QtGui.QPixmap.fromImage(qImg))
+
+
+def ConvertOpenCvImageGrayToQImage(img, self):
+    height = img.shape[0]
+    width = img.shape[1]
+
+    bytesPerLine = 1 * width
+
+    qImg = QtGui.QImage(img.data, width, height,
+                        bytesPerLine, QtGui.QImage.Format_Grayscale8)
+
+    self.label.setPixmap(QtGui.QPixmap.fromImage(qImg))
 
 
 if __name__ == "__main__":
@@ -181,3 +232,6 @@ if __name__ == "__main__":
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
+
+
+

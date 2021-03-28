@@ -14,7 +14,7 @@ import cv2
 import numpy as np
 
 
-class Ui_MainWindow(QDialog):
+class Ui_MainWindow(MainWindow):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(1395, 715)

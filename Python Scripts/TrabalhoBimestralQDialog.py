@@ -125,6 +125,8 @@ class Ui_Dialog(QDialog):
         self.applyThresholdButton.clicked.connect(self.ApplyBinaryThreshold)
         self.applyGaussianButton.clicked.connect(self.ApplyGaussianBlur)
         self.applyMorphGradButton.clicked.connect(self.ApplyGradientMorph)
+        self.listWidget.doubleClicked.connect(self.DisplayItemFromList)
+        self.removeButton.clicked.connect(self.RemoveFromList)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -145,6 +147,19 @@ class Ui_Dialog(QDialog):
 
     img = 0 
 
+
+    def DisplayItemFromList(self):
+        print("oi")
+        index = self.listWidget.currentIndex().row()
+        print(index)
+        cv2.imshow("From History", listOfActions[index])
+
+
+    def RemoveFromList(self):
+        index = self.listWidget.currentIndex().row()
+        self.listWidget.takeItem(index)
+        listOfActions.pop(index)
+
     def BrowseFile(self):
         global img
 
@@ -156,21 +171,26 @@ class Ui_Dialog(QDialog):
         img = cv2.imread(filePath[0])
         self.label.setPixmap(QtGui.QPixmap(filePath[0]))
         self.listWidget.addItem(filePath[0])
-
+        listOfActions.append(img)
+    
 
     def ConvertBGR2HSL(self):
-        global img
+        global img, hslCount
 
         if (len(img.shape) == 2):
             img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
 
         img = cv2.cvtColor(img, cv2.COLOR_BGR2HLS)
 
+        hslCount += 1
+
+        self.listWidget.addItem("HSL Conversion Applied: " + str(hslCount))
+        listOfActions.append(img)
         cv2.imshow("HSL Conversion", img)
         
 
     def ApplyBinaryThreshold(self):
-        global img
+        global img, thresCount
 
         if (len(img.shape) == 3):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
@@ -178,20 +198,28 @@ class Ui_Dialog(QDialog):
         thresholdValue, img = cv2.threshold(
             img, 127, 255, cv2.THRESH_BINARY)
 
+        thresCount += 1
+
+        self.listWidget.addItem("Threshold Binary Applied: " + str(thresCount))
+        listOfActions.append(img)
         cv2.imshow("Threshold Binary Applied", img)
 
 
     def ApplyGaussianBlur(self):
-        global img
+        global img, blurCount
 
         img = cv2.GaussianBlur(img, (5, 5), 10)
 
+        blurCount += 1
+
+        self.listWidget.addItem("Gaussian Blur Applied: " + str(blurCount))
+        listOfActions.append(img)
         cv2.imshow("Gaussian Blur Applied", img)
         
 
 
     def ApplyGradientMorph(self):
-        global img
+        global img, gradientCount
 
         if (len(img.shape) == 3):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
@@ -200,8 +228,20 @@ class Ui_Dialog(QDialog):
         sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=5)
         img = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
 
-        cv2.imshow("Aula2", img)
+        gradientCount += 1
 
+        self.listWidget.addItem(
+            "Gradient Morphological Applied: " + str(gradientCount))
+        listOfActions.append(img)
+        cv2.imshow("Gradient Morphological Applied", img)
+
+
+listOfActions = []
+hslCount = 0
+thresCount = 0
+blurCount = 0 
+gradientCount = 0
+borderCount = 0 
 
 # def ConvertOpenCvImageToQImage(img, self):
 #     height, width, channel = img.shape

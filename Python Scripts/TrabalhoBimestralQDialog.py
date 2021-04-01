@@ -127,6 +127,7 @@ class Ui_Dialog(QDialog):
         self.applyMorphGradButton.clicked.connect(self.ApplyGradientMorph)
         self.listWidget.doubleClicked.connect(self.DisplayItemFromList)
         self.removeButton.clicked.connect(self.RemoveFromList)
+        self.clearButton.clicked.connect(self.ClearList)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -147,6 +148,8 @@ class Ui_Dialog(QDialog):
 
     img = 0 
 
+    #TODO Implementação do detector de borda
+    #TODO Tide up na interface ? 
 
     def DisplayItemFromList(self):
         print("oi")
@@ -159,6 +162,10 @@ class Ui_Dialog(QDialog):
         index = self.listWidget.currentIndex().row()
         self.listWidget.takeItem(index)
         listOfActions.pop(index)
+
+    def ClearList(self):
+        self.listWidget.clear()
+        listOfActions.clear()
 
     def BrowseFile(self):
         global img
@@ -259,7 +266,7 @@ def ConvertOpenCvImageGrayToQImage(img, self):
     bytesPerLine = 1 * width
 
     qImg = QtGui.QImage(img.data, width, height,
-                        bytesPerLine, QtGui.QImage.Format_Grayscale8)
+                        bytesPerLine, QtGui.QImage.Format_Grayscale8).rgbSwapped()
 
     self.label.setPixmap(QtGui.QPixmap.fromImage(qImg))
 

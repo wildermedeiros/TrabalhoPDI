@@ -128,6 +128,7 @@ class Ui_Dialog(QDialog):
         self.listWidget.doubleClicked.connect(self.DisplayItemFromList)
         self.removeButton.clicked.connect(self.RemoveFromList)
         self.clearButton.clicked.connect(self.ClearList)
+        self.applyBorderDetection.clicked.connect(self.ApplyBorderDetection)
 
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
@@ -148,7 +149,6 @@ class Ui_Dialog(QDialog):
 
     img = 0 
 
-    #TODO Implementação do detector de borda
     #TODO Tide up na interface ? 
 
     def DisplayItemFromList(self):
@@ -164,11 +164,16 @@ class Ui_Dialog(QDialog):
         listOfActions.pop(index)
 
     def ClearList(self):
+        global img, imgSourceCopy
+
         self.listWidget.clear()
         listOfActions.clear()
+        cv2.destroyAllWindows()
+        img = imgSourceCopy.copy()
+        
 
     def BrowseFile(self):
-        global img
+        global img, imgSourceCopy
 
         filePath = QFileDialog.getOpenFileName(self, 'Open File')
 
@@ -176,6 +181,7 @@ class Ui_Dialog(QDialog):
 
         self.lineEdit.setText(filePath[0])
         img = cv2.imread(filePath[0])
+        imgSourceCopy = img.copy()
         self.label.setPixmap(QtGui.QPixmap(filePath[0]))
         self.listWidget.addItem(filePath[0])
         listOfActions.append(img)
@@ -231,8 +237,8 @@ class Ui_Dialog(QDialog):
         if (len(img.shape) == 3):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
 
-        sobelx = cv2.Sobel(img, cv2.CV_32F, 1, 0, ksize=5)
-        sobely = cv2.Sobel(img, cv2.CV_32F, 0, 1, ksize=5)
+        sobelx = cv2.Sobel(img, cv2.CV_8UC1, 1, 0, ksize=5)
+        sobely = cv2.Sobel(img, cv2.CV_8UC1, 0, 1, ksize=5)
         img = cv2.addWeighted(sobelx, 0.5, sobely, 0.5, 0)
 
         gradientCount += 1
@@ -243,12 +249,33 @@ class Ui_Dialog(QDialog):
         cv2.imshow("Gradient Morphological Applied", img)
 
 
+    def ApplyBorderDetection(self):
+        global img, borderCount
+
+        if (len(img.shape) == 3):
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)    
+
+        externalContours = np.zeros(img.shape)
+
+        contours, hierarchy = cv2.findContours(img, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+
+        for i in range(len(contours)):
+
+            if hierarchy[0][i][3] == -1:
+
+                cv2.drawContours(externalContours, contours, i, 255, 2)
+
+        cv2.imshow("Contour Detection Applied", externalContours)
+
+
 listOfActions = []
 hslCount = 0
 thresCount = 0
 blurCount = 0 
 gradientCount = 0
 borderCount = 0 
+imgSourceCopy = 0
+
 
 # def ConvertOpenCvImageToQImage(img, self):
 #     height, width, channel = img.shape

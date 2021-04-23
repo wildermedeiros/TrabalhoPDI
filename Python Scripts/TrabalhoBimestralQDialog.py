@@ -265,6 +265,11 @@ class Ui_Dialog(QDialog):
 
                 cv2.drawContours(externalContours, contours, i, 255, 2)
 
+
+        borderCount += 1
+
+        self.listWidget.addItem("Contour Detection Applied: " + str(borderCount))
+        listOfActions.append(externalContours)
         cv2.imshow("Contour Detection Applied", externalContours)
 
 

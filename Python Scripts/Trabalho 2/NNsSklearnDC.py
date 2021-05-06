@@ -16,10 +16,13 @@ y = labels
 
 XTrain, XTest, yTrain, yTest = train_test_split(X, y, test_size=0.33, random_state=42)
 
-# 'linear' , 'rbf', 'poly', 'sigmoid' 
-svmModel = SVC(C = .1, kernel = 'linear', gamma = 1, verbose = 2)
-svmModel.fit(XTrain, yTrain)
+from sklearn.neural_network import MLPClassifier
+mlp = MLPClassifier(hidden_layer_sizes=(24), activation='relu', solver='adam', max_iter=50, verbose = 2)
 
-prediction = svmModel.predict(XTest)
-print(svmModel.score(XTrain, yTrain))
-print(svmModel.score(XTest, yTest))
+mlp.fit(XTrain, yTrain)
+
+predictions = mlp.predict(XTest)
+
+print(confusion_matrix(yTest, predictions))
+
+print(classification_report(yTest, predictions))

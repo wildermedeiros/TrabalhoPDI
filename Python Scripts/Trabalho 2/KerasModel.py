@@ -39,6 +39,6 @@ model.fit(scaledXTrain, yTrain, epochs = 50 , verbose = 2)
 from sklearn.metrics import confusion_matrix, classification_report
 
 predictions = model.predict_classes(scaledXTest)
-confusion_matrix(yTest, predictions)
 
+print(confusion_matrix(yTest, predictions))
 print(classification_report(yTest, predictions))
